@@ -240,7 +240,7 @@ handle_server_message(SoupWebsocketConnection* conn, SoupWebsocketDataType type,
 
 //ЗДЕСЯ РАБОТАЕМ
 static gboolean
-start_pipepline(void)
+start_pipeline(void)
 {
     GError* error = NULL;
 

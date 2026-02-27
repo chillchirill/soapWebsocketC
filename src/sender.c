@@ -4,7 +4,7 @@
  * Source base:
  *  - webrtc-sendrecv.c demo by Nirbheek Chauhan (Centricular)
  *    (same structure: libsoup websocket signaling + json-glib + webrtcbin callbacks)
- *  - Your gst-launch pipeline idea:
+ *  - Your gst-launch pipepline idea:
  *      mfvideosrc ! ... ! x264enc tune=zerolatency ... ! h264parse ! rtph264pay pt=96 ... ! (instead of udpsink) -> webrtcbin
  *
  * Build (Linux):
@@ -28,7 +28,7 @@
 
  /* ---------- Globals ---------- */
 static GMainLoop* loop = NULL;
-static GstElement* pipe = NULL;
+static GstElement* pipep = NULL;
 static GstElement* webrtc = NULL;
 
 static SoupWebsocketConnection* ws_conn = NULL;
@@ -63,9 +63,9 @@ cleanup_and_quit(const gchar* msg)
             g_clear_object(&ws_conn);
     }
 
-    if (pipe) {
-        gst_element_set_state(pipe, GST_STATE_NULL);
-        g_clear_object(&pipe);
+    if (pipep) {
+        gst_element_set_state(pipep, GST_STATE_NULL);
+        g_clear_object(&pipep);
         webrtc = NULL;
     }
 
@@ -234,18 +234,18 @@ handle_server_message(SoupWebsocketConnection* conn, SoupWebsocketDataType type,
     g_free(text);
 }
 
-/* ---------- Create sender pipeline ---------- */
+/* ---------- Create sender pipepline ---------- */
 
 
 
 //ЗДЕСЯ РАБОТАЕМ
 static gboolean
-start_pipeline(void)
+start_pipepline(void)
 {
     GError* error = NULL;
 
     /* webrtcbin first, then send RTP into sendrecv. */
-    pipe = gst_parse_launch(
+    pipep = gst_parse_launch(
         "webrtcbin name=sendrecv bundle-policy=max-bundle latency=20 "
         "mfvideosrc do-timestamp=true ! "
         "video/x-raw,width=640,height=360,framerate=30/1 ! "
@@ -260,17 +260,17 @@ start_pipeline(void)
         &error);
 
     if (error) {
-        g_printerr("[sender] Failed to parse pipeline: %s\n", error->message);
+        g_printerr("[sender] Failed to parse pipepline: %s\n", error->message);
         g_error_free(error);
         return FALSE;
     }
 
-    if (!GST_IS_BIN(pipe)) {
-        g_printerr("[sender] Parsed pipeline is not a bin/pipeline\n");
+    if (!GST_IS_BIN(pipep)) {
+        g_printerr("[sender] Parsed pipepline is not a bin/pipepline\n");
         return FALSE;
     }
 
-    webrtc = gst_bin_get_by_name(GST_BIN(pipe), "sendrecv");
+    webrtc = gst_bin_get_by_name(GST_BIN(pipep), "sendrecv");
     if (!webrtc) {
         g_printerr("[sender] Failed to get webrtcbin by name 'sendrecv'\n");
         return FALSE;
@@ -284,12 +284,12 @@ start_pipeline(void)
     g_signal_connect(webrtc, "on-negotiation-needed", G_CALLBACK(on_negotiation_needed), NULL);
     g_signal_connect(webrtc, "on-ice-candidate", G_CALLBACK(send_ice_candidate), NULL);
 
-    if (gst_element_set_state(pipe, GST_STATE_PLAYING) == GST_STATE_CHANGE_FAILURE) {
-        g_printerr("[sender] Failed to set pipeline to PLAYING\n");
+    if (gst_element_set_state(pipep, GST_STATE_PLAYING) == GST_STATE_CHANGE_FAILURE) {
+        g_printerr("[sender] Failed to set pipepline to PLAYING\n");
         return FALSE;
     }
 
-    g_print("[sender] Pipeline started (VP8)\n");
+    g_print("[sender] pipepline started (VP8)\n");
     return TRUE;
 }
 /* ---------- WebSocket connect ---------- */
@@ -320,8 +320,8 @@ on_server_connected(SoupSession* session, GAsyncResult* res, SoupMessage* msg)
     g_signal_connect(ws_conn, "closed", G_CALLBACK(on_server_closed), NULL);
 
     /* Start media after WS is up (simple + predictable) */
-    if (!start_pipeline())
-        cleanup_and_quit("[sender] Failed to start pipeline");
+    if (!start_pipepline())
+        cleanup_and_quit("[sender] Failed to start pipepline");
 }
 
 static gboolean

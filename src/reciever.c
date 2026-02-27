@@ -19,7 +19,7 @@
 
  /* ---------- Globals ---------- */
 static GMainLoop* loop = NULL;
-static GstElement* pipe = NULL;
+static GstElement* pipep = NULL;
 static GstElement* webrtc = NULL;
 
 static SoupWebsocketConnection* ws_conn = NULL;
@@ -56,9 +56,9 @@ cleanup_and_quit(const gchar* msg)
             g_clear_object(&ws_conn);
     }
 
-    if (pipe) {
-        gst_element_set_state(pipe, GST_STATE_NULL);
-        g_clear_object(&pipe);
+    if (pipep) {
+        gst_element_set_state(pipep, GST_STATE_NULL);
+        g_clear_object(&pipep);
         webrtc = NULL;
     }
 
@@ -76,7 +76,7 @@ cleanup_and_quit(const gchar* msg)
 
 /*Треба віддебажити*/
 static void
-on_incoming_stream(GstElement* webrtc, GstPad* pad, GstElement* pipe)
+on_incoming_stream(GstElement* webrtc, GstPad* pad, GstElement* pipep)
 {
     (void)webrtc;
 
@@ -164,7 +164,7 @@ on_incoming_stream(GstElement* webrtc, GstPad* pad, GstElement* pipe)
         gst_object_unref(vsink);
     }
 
-    gst_bin_add(GST_BIN(pipe), rxbin);
+    gst_bin_add(GST_BIN(pipep), rxbin);
     gst_element_sync_state_with_parent(rxbin);
 
     /* У rxbin буде ghost sink pad (бо TRUE в gst_parse_bin_from_description) */
@@ -338,33 +338,33 @@ handle_server_message(SoupWebsocketConnection* conn, SoupWebsocketDataType type,
     g_free(text);
 }
 
-/* ---------- Create receiver pipeline ---------- */
+/* ---------- Create receiver pipepline ---------- */
 static gboolean
-start_pipeline(void)
+start_pipepline(void)
 {
-    pipe = gst_pipeline_new("receiver-pipeline");
+    pipep = gst_pipepline_new("receiver-pipepline");
     webrtc = gst_element_factory_make("webrtcbin", "sendrecv");
 
-    if (!pipe || !webrtc) {
-        g_printerr("[receiver] Failed to create pipeline or webrtcbin\n");
+    if (!pipep || !webrtc) {
+        g_printerr("[receiver] Failed to create pipepline or webrtcbin\n");
         return FALSE;
     }
 
     /* Match your previous parse-launch property */
     g_object_set(webrtc, "bundle-policy", GST_WEBRTC_BUNDLE_POLICY_MAX_BUNDLE, NULL);
 
-    gst_bin_add(GST_BIN(pipe), webrtc);
+    gst_bin_add(GST_BIN(pipep), webrtc);
 
     g_signal_connect(webrtc, "on-ice-candidate", G_CALLBACK(send_ice_candidate), NULL);
-    g_signal_connect(webrtc, "pad-added", G_CALLBACK(on_incoming_stream), pipe);
+    g_signal_connect(webrtc, "pad-added", G_CALLBACK(on_incoming_stream), pipep);
 
-    GstStateChangeReturn sret = gst_element_set_state(pipe, GST_STATE_PLAYING);
+    GstStateChangeReturn sret = gst_element_set_state(pipep, GST_STATE_PLAYING);
     if (sret == GST_STATE_CHANGE_FAILURE) {
-        g_printerr("[receiver] Failed to set pipeline to PLAYING\n");
+        g_printerr("[receiver] Failed to set pipepline to PLAYING\n");
         return FALSE;
     }
 
-    g_print("[receiver] Pipeline started (waiting for offer)\n");
+    g_print("[receiver] pipepline started (waiting for offer)\n");
     return TRUE;
 }
 
@@ -395,8 +395,8 @@ on_server_connected(SoupSession* session, GAsyncResult* res, SoupMessage* msg)
     g_signal_connect(ws_conn, "message", G_CALLBACK(handle_server_message), NULL);
     g_signal_connect(ws_conn, "closed", G_CALLBACK(on_server_closed), NULL);
 
-    if (!start_pipeline())
-        cleanup_and_quit("[receiver] Failed to start pipeline");
+    if (!start_pipepline())
+        cleanup_and_quit("[receiver] Failed to start pipepline");
 }
 
 

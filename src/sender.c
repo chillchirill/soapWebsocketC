@@ -234,7 +234,7 @@ handle_server_message(SoupWebsocketConnection* conn, SoupWebsocketDataType type,
     g_free(text);
 }
 
-/* ---------- Create sender pipepline ---------- */
+/* ---------- Create sender pipeline ---------- */
 
 
 
@@ -260,13 +260,13 @@ start_pipepline(void)
         &error);
 
     if (error) {
-        g_printerr("[sender] Failed to parse pipepline: %s\n", error->message);
+        g_printerr("[sender] Failed to parse pipeline: %s\n", error->message);
         g_error_free(error);
         return FALSE;
     }
 
     if (!GST_IS_BIN(pipep)) {
-        g_printerr("[sender] Parsed pipepline is not a bin/pipepline\n");
+        g_printerr("[sender] Parsed pipeline is not a bin/pipeline\n");
         return FALSE;
     }
 
@@ -285,11 +285,11 @@ start_pipepline(void)
     g_signal_connect(webrtc, "on-ice-candidate", G_CALLBACK(send_ice_candidate), NULL);
 
     if (gst_element_set_state(pipep, GST_STATE_PLAYING) == GST_STATE_CHANGE_FAILURE) {
-        g_printerr("[sender] Failed to set pipepline to PLAYING\n");
+        g_printerr("[sender] Failed to set pipeline to PLAYING\n");
         return FALSE;
     }
 
-    g_print("[sender] pipepline started (VP8)\n");
+    g_print("[sender] pipeline started (VP8)\n");
     return TRUE;
 }
 /* ---------- WebSocket connect ---------- */
@@ -320,8 +320,8 @@ on_server_connected(SoupSession* session, GAsyncResult* res, SoupMessage* msg)
     g_signal_connect(ws_conn, "closed", G_CALLBACK(on_server_closed), NULL);
 
     /* Start media after WS is up (simple + predictable) */
-    if (!start_pipepline())
-        cleanup_and_quit("[sender] Failed to start pipepline");
+    if (!start_pipeline())
+        cleanup_and_quit("[sender] Failed to start pipeline");
 }
 
 static gboolean

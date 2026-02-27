@@ -340,9 +340,9 @@ handle_server_message(SoupWebsocketConnection* conn, SoupWebsocketDataType type,
 
 /* ---------- Create receiver pipepline ---------- */
 static gboolean
-start_pipepline(void)
+start_pipeline(void)
 {
-    pipep = gst_pipepline_new("receiver-pipepline");
+    pipep = gst_pipeline_new("receiver-pipepline");
     webrtc = gst_element_factory_make("webrtcbin", "sendrecv");
 
     if (!pipep || !webrtc) {
@@ -364,7 +364,7 @@ start_pipepline(void)
         return FALSE;
     }
 
-    g_print("[receiver] pipepline started (waiting for offer)\n");
+    g_print("[receiver] pipeline started (waiting for offer)\n");
     return TRUE;
 }
 
@@ -395,8 +395,8 @@ on_server_connected(SoupSession* session, GAsyncResult* res, SoupMessage* msg)
     g_signal_connect(ws_conn, "message", G_CALLBACK(handle_server_message), NULL);
     g_signal_connect(ws_conn, "closed", G_CALLBACK(on_server_closed), NULL);
 
-    if (!start_pipepline())
-        cleanup_and_quit("[receiver] Failed to start pipepline");
+    if (!start_pipeline())
+        cleanup_and_quit("[receiver] Failed to start pipeline");
 }
 
 

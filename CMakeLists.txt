@@ -6,7 +6,7 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 
 add_executable(sender
     src/sender.c
-    #src/reciever.c
+    src/reciever.c
 )
 
 # vcpkg will provide pkgconf + .pc files for gstreamer/libsoup/json-glib

@@ -180,6 +180,9 @@ on_negotiation_needed(GstElement* element, gpointer user_data)
     g_signal_emit_by_name(webrtc, "create-offer", NULL, promise);
 }
 
+
+
+
 /* ---------- Parse incoming messages (we ignore offers, we only accept answer + ICE) ---------- */
 static void
 handle_server_message(SoupWebsocketConnection* conn, SoupWebsocketDataType type,

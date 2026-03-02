@@ -29,6 +29,21 @@ static gboolean disable_ssl = TRUE; /* currently not wired for libsoup3 self-sig
 
 static gboolean video_chain_built = FALSE;
 
+static const gchar* wspassword = "default";
+
+
+static void send_text(const gchar* text)
+{
+    if (!ws_conn) {
+        g_printerr("[sender] ws_conn == NULL, not connected yet\n");
+        return;
+    }
+
+    /* Текст має бути валідним UTF-8 */
+    soup_websocket_connection_send_text(ws_conn, text);
+    g_print("[sender] Sent text: %s\n", text);
+}
+
 /* ---------- Helpers: JSON stringify ---------- */
 static gchar*
 json_object_to_string(JsonObject* object)
@@ -394,7 +409,7 @@ on_server_connected(SoupSession* session, GAsyncResult* res, SoupMessage* msg)
     g_print("[receiver] Connected to signaling server\n");
     g_signal_connect(ws_conn, "message", G_CALLBACK(handle_server_message), NULL);
     g_signal_connect(ws_conn, "closed", G_CALLBACK(on_server_closed), NULL);
-
+    send_text(wspassword);
     if (!start_pipeline())
         cleanup_and_quit("[receiver] Failed to start pipeline");
 }
@@ -454,10 +469,18 @@ connect_to_server_async(void)
 
 /* ---------- CLI ---------- */
 static GOptionEntry entries[] = {
-  {"server", 0, 0, G_OPTION_ARG_STRING, &server_url, "Signaling server URL (wss://...)", "URL"},
-  {"disable-ssl", 0, 0, G_OPTION_ARG_NONE, &disable_ssl, "Disable TLS cert checks (useful for self-signed)", NULL},
+  {"server", 0, 0, G_OPTION_ARG_STRING, &server_url,
+   "Signaling server URL (wss://...)", "URL"},
+
+  {"disable-ssl", 0, 0, G_OPTION_ARG_NONE, &disable_ssl,
+   "Disable TLS cert checks (useful for self-signed)", NULL},
+
+  {"password", 0, 0, G_OPTION_ARG_STRING, &wspassword,
+   "Text message to send after connect for corresponding webSocket connection", "TEXT"},
+
   {NULL}
 };
+
 
 int
 main(int argc, char* argv[])

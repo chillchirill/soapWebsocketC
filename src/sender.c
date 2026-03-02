@@ -392,18 +392,18 @@ connect_to_server_async(void)
 }
 
 /* ---------- CLI ---------- */
-static GOptionEntry entries[] = {
-  {"server", 0, 0, G_OPTION_ARG_STRING, &server_url,
-   "Signaling server URL (wss://...)", "URL"},
+    static GOptionEntry entries[] = {
+      {"server", 0, 0, G_OPTION_ARG_STRING, &server_url,
+       "Signaling server URL (wss://...)", "URL"},
 
-  {"disable-ssl", 0, 0, G_OPTION_ARG_NONE, &disable_ssl,
-   "Disable TLS cert checks (useful for self-signed)", NULL},
+      {"disable-ssl", 0, 0, G_OPTION_ARG_NONE, &disable_ssl,
+       "Disable TLS cert checks (useful for self-signed)", NULL},
 
-  {"password", 0, 0, G_OPTION_ARG_STRING, &wspassword,
-   "Text message to send after connect for corresponding webSocket connection", "TEXT"},
+      {"password", 0, 0, G_OPTION_ARG_STRING, &wspassword,
+       "Text message to send after connect for corresponding webSocket connection", "TEXT"},
 
-  {NULL}
-};
+      {NULL}
+    };
 
 int
 main(int argc, char* argv[])

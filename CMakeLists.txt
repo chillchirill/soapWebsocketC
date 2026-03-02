@@ -6,6 +6,9 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 
 add_executable(sender
     src/sender.c
+)
+
+add_executable(reciever
     src/reciever.c
 )
 

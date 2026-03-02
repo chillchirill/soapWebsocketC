@@ -1,13 +1,13 @@
 {
-    "name": "soap-websocket-c",
-    "version-string": "0.1.0",
-    "builtin-baseline": "3426db05b996481ca31e95fff3734cf23e0f51bc",
+    "name": "soapwebsocketc",
+    "version-string": "1.0.0",
     "dependencies": [
-        "glib",
-        "json-glib",
+        "pkgconf",
+        {
+            "name": "gstreamer",
+            "features": [ "plugins-base", "plugins-bad", "webrtc", "soup" ]
+        },
         "libsoup",
-        "gstreamer",
-        "gst-plugins-base",
-        "gst-plugins-bad"
+        "json-glib"
     ]
 }
